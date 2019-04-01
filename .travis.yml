@@ -3,14 +3,10 @@ language: python
 matrix:
   include:
     - stage: tests
-      python: "3.4"
-      name: "Unit Tests"
-      script: python3 -m unittest
-    - stage: tests
-      python: "3.5"
+      python: "3.6"
       name: "Unit Tests"
       script: python3 -m unittest
     - stage: tests
       python: "3.6"
-      name: "Unit Tests"
-      script: python3 -m unittest
+      name: "Integration Test"
+      script: ./getdiskusage.py ./
