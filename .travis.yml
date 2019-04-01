@@ -10,3 +10,7 @@ matrix:
       python: "3.6"
       name: "Integration Test"
       script: ./getdiskusage.py ./
+    - stage: tests
+      python: "3.6"
+      name: "Integration Test"
+      script: ./getdiskusage.py -u m ./
