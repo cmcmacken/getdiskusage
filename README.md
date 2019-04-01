@@ -19,7 +19,7 @@ Print the disk usage for all the files at a given path
 ## Usage information
 
 ```
-usage: getdiskusage.py [-h] [-u {b,m,g}] [-l {INFO,WARN,ERROR,DEBUG}] path
+usage: getdiskusage.py [-h] [-u {b,m,g}] path
 
 positional arguments:
   path                  The Path we use to report disk usage on
@@ -29,7 +29,6 @@ optional arguments:
   -u {b,m,g}, --unit {b,m,g}
                         Unit used to report file size. b: byte, m: Mbyte, g:
                         Gbyte
-  -l {INFO,WARN,ERROR,DEBUG}, --log-level {INFO,WARN,ERROR,DEBUG}
   ```
 
 ## Running Unit tests
