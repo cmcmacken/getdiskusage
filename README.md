@@ -9,11 +9,10 @@ Print the disk usage for all the files at a given path
 ## Installation
 
 1. Install Python 3.6+ in your $PATH
-2. Requires GNU version of `du`,
+2. Requires GNU version of `du`
     1. On Mac OSX this can be installed as `gdu` via the homebrew `coreutils` package
 2. Clone repository or download getdiskusage.py [here](https://raw.githubusercontent.com/cmcmacken/getdiskusage/master/getdiskusage.py)
-3. Ensure `getdiskusage.py` is executable by executing the following command
-`chmod +x getdiskusage.py`
+3. Ensure `getdiskusage.py` is executable by executing the following command `chmod +x getdiskusage.py`
 4. Run via `getdiskusage.py` or `python3 getdiskusage.py`
 
 ## Usage information
