@@ -1,5 +1,9 @@
 # getdiskusage.py
 
+[![Build Status](https://travis-ci.org/cmcmacken/getdiskusage.svg?branch=master)](https://travis-ci.org/cmcmacken/getdiskusage)
+
+
+
 Print the disk usage for all the files at a given path
 
 ## Installation
