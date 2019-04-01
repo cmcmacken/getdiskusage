@@ -13,7 +13,7 @@ class GetDuTest(unittest.TestCase):
         mock_which.return_value = None
 
         with self.assertRaises(RuntimeError):
-            du_name = get_du_binary()
+            get_du_binary()
 
     @patch("shutil.which")
     @patch("platform.system")
@@ -40,7 +40,7 @@ class GetDuTest(unittest.TestCase):
         mock_which.return_value = False
 
         with self.assertRaises(FileNotFoundError):
-            du_name = get_du_binary()
+            get_du_binary()
 
 
 class ParseOutputTestCase(unittest.TestCase):
@@ -56,6 +56,13 @@ class ParseOutputTestCase(unittest.TestCase):
         self.assertEqual(len(json_output["files"]), 4)
         self.assertIn({"/var/log/daily.out": "17015"}, json_output["files"])
 
+    def test_malformed_output(self):
+        sample_output = "824/var/log/fsck_apfs_error.log\n17015	/var/log/daily.out\n0	/var/log/appfirewall.log\n43147246	/var/log"""
+
+        fake_result = type("obj", (object,), {"stdout" : sample_output})
+
+        with self.assertRaises(ValueError):
+            parse_output(fake_result)
 
 if __name__ == '__main__':
     unittest.main()

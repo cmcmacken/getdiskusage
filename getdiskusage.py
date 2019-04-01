@@ -3,29 +3,35 @@
 import argparse
 import subprocess
 from pathlib import Path
-import logging
 import platform
 import re
 import json
 import shutil
 
-parser = argparse.ArgumentParser()
-parser.add_argument("path", help="The Path we use to report disk usage on")
-parser.add_argument("-u", "--unit",
-                    default="b",
-                    choices=["b", "m", "g"],
-                    help="Unit used to report file size. b: byte, m: Mbyte, g: Gbyte")
-parser.add_argument("-l", "--log-level",
-                    choices=["INFO", "WARN", "ERROR", "DEBUG"],
-                    default="WARN")
 
 def parse_output(command_result, format="json"):
+    """
+    Parse the output of our du command into a basic datastructure and convert it to the output format we want
+
+    """
+
     file_list = []
     for line in command_result.stdout.split('\n'):
-        if line != '':
-            result = line.split('\t')
+        if line == '':
+            continue
+        elif "\t" not in line:
+            raise ValueError(
+                "Output from disk usage executable is not what we expected.")
 
-        file_list.append({result[1]: result[0]})
+        result = re.search(r"(\d+)\s+(.+)", line)
+
+        if not result:
+            raise ValueError(
+                "Output from disk usage executable is not what we expected.")
+
+        file_size = result.group(1)
+        file_name = result.group(2)
+        file_list.append({file_name: file_size})
 
     output = ""
     if format == "json":
@@ -33,37 +39,42 @@ def parse_output(command_result, format="json"):
 
     return output
 
+
 def get_du_binary():
+    """
+    Support some different platforms, specifically Mac OSX since it doesn't have GNU du installed
+    """
     du_name = "du"
 
     # choose the right du executable since OS X doesn't follow the standards
     if platform.system() == "Darwin":
         du_name = "gdu"
     elif platform.system() == "Windows":
-        raise RuntimeError("The windows operating system is not supported at this time.")
+        raise RuntimeError(
+            "The windows operating system is not supported at this time.")
 
     if not shutil.which(du_name):
-        raise FileNotFoundError("The executable {} not found in $PATH".format(du_name))
+        raise FileNotFoundError(
+            "The executable was not found in the $PATH", du_name)
 
     return du_name
 
+
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("path", help="The Path we use to report disk usage on")
+    parser.add_argument("-u", "--unit",
+                        default="b",
+                        choices=["b", "m", "g"],
+                        help="Unit used to report file size. b: byte, m: Mbyte, g: Gbyte")
+
     args = parser.parse_args()
-
-    # convert to the value that logging expects
-    log_level = getattr(logging, args.log_level.upper())
-
-    # setup logging
-    # this would be sent to a log file for some kind of log aggregation tool i.e. splunk
-    logging.basicConfig(level=log_level)
 
     mount_point = Path(args.path).resolve()
 
     # ensure path exists
     if not mount_point.exists():
-        message = "Path {} doesn't exist.".format(mount_point)
-        logging.error(message)
-        raise FileNotFoundError(message)
+        raise FileNotFoundError("Path doesn't exist.", mount_point)
 
     # ensure the binary we need exists
     du_name = get_du_binary()
@@ -73,12 +84,14 @@ def main():
                             "-{}".format(args.unit),
                             "-a",
                             mount_point],
-                            capture_output=True,
+                            check=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
                             encoding='utf-8')
 
-    json_output = parse_output(output)
+    output = parse_output(output)
+    print(output)
 
-    print(json_output)
 
 if __name__ == '__main__':
     main()
